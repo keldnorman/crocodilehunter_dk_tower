@@ -23,18 +23,19 @@ EOF
 #--------------------------------------------------------------------
 # PATH TO UTILITIES
 #--------------------------------------------------------------------
-SOURCE_DIRECTORY_FOR_CROCODILEHUNTER="./crocodilehunter/src"
 JQ="/usr/bin/jq"
+WGET="/usr/bin/wget"
+PYTHON3="/usr/bin/python3"
 MYSQL_CLIENT="/usr/bin/mysql"
 MYSQL_INIT_SCRIPT="/etc/init.d/mysql"
-MYSQL_PASSWORD="your_mysql_code_here"
-PYTHON3="/usr/bin/python3"
 IMPORT_GPSDATA_SCRIPT="./add_known_tower.py"
 #--------------------------------------------------------------------
 # VARIABLES
 #--------------------------------------------------------------------
+MYSQL_PASSWORD="your_mysql_code"
 TOWER_DATA_FILE="/tmp/antenner.json"
 TOWER_DATA_GPS_COORDINATES_FILE="/tmp/antenner.gps"
+SOURCE_DIRECTORY_FOR_CROCODILEHUNTER="./crocodilehunter/src"
 #--------------------------------------------------------------------
 # CHECK IF JQ IS INSTALLED TO PROCESS JSON AND PYTHON3 TO IMPORT DATA
 #--------------------------------------------------------------------
@@ -49,9 +50,16 @@ else
  fi
 fi
 if [ ! -x ${PYTHON3} ]; then 
-  printf "\n ### ERROR - I cant find ${PYTHON3}\n\n Please install it or alter the path to the utility it in this script\n\n"
-  exit
- fi
+ printf "\n ### ERROR - I cant find ${PYTHON3}\n\n Please install it or alter the path to the utility it in this script\n\n"
+ exit
+fi
+#--------------------------------------------------------------------
+# CHECK IF WGET IS INSTALLED
+#--------------------------------------------------------------------
+if [ ! -x ${WGET} ]; then 
+ printf "\n ### ERROR - I cant find ${WGET}\n\n Please install it or alter the path to the utility it in this script\n\n"
+ exit
+fi
 #--------------------------------------------------------------------
 # CHECK IF MYSQL IS INSTALLED AND RUNNING
 #--------------------------------------------------------------------
@@ -99,7 +107,6 @@ function select_database {
   select SELECT_DATABASE in ${DATABASES}; do
    if [ "${SELECT_DATABASE:-empty}" != "empty" ]; then
     DATABASE="${SELECT_DATABASE}"
-    echo ""
     break
    else
     echo -e "\033[2A "
@@ -116,7 +123,7 @@ function select_database {
 function download_data {
 #--------------------------------------------------------------------
  printf " - Downloading the data from mastedatabasen.dk..\n"
- wget -q "https://mastedatabasen.dk/Master/antenner.json?maxantal=1000000&BBOX=441500,6049700,893400,6402330,EPSG:25832&tjenesteart=2" -O ${TOWER_DATA_FILE}
+ ${WGET} --connect-timeout=30 -q 'https://mastedatabasen.dk/Master/antenner.json?maxantal=1000000&BBOX=441500,6049700,893400,6402330,EPSG:25832&tjenesteart=2' -O ${TOWER_DATA_FILE}
  if [ $? -ne 0 ]; then 
   printf "\n ### ERROR - An unknown error occured during the download of data!\n\n"
   exit
