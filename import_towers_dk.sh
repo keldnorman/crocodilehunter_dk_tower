@@ -141,8 +141,8 @@ while true; do
     read -p " Do you wish to download and import DK Cell-tower GPS positions in to the database (y/n) ?: " yn
     case $yn in
         [Yy]* ) IMPORT=1 ;
-                if [ ! -f ${SOURCE_DIRECTORY_FOR_CROCODILEHUNTER}/${IMPORT_GPSDATA_SCRIPT} ]; then 
-                 printf "\n ### ERROR - I cant find the import gpsdata script ( ${SOURCE_DIRECTORY_FOR_CROCODILEHUNTER}/${IMPORT_GPSDATA_SCRIPT} )\n\n"
+                if [ ! -f ${IMPORT_GPSDATA_SCRIPT} ]; then 
+                 printf "\n ### ERROR - I cant find the import gpsdata script ( ${IMPORT_GPSDATA_SCRIPT} )\n\n"
                  exit 1
                 fi
                 break ;;
